@@ -7,18 +7,41 @@ class HelmholtzSolver:
     def __init__(
             self,
             k: float,
-            n: numpy.ndarray,
-            f: numpy.ndarray,
-            delta: Tuple[float, float],
-            boundary_cond: Tuple[float, float, float, float] = (0, 0, 0, 0)):
+            n_map: numpy.ndarray,
+            f_map: numpy.ndarray,
+            delta: Tuple[float, float]):
         self.k = k
-        self.n = n
-        self.f = f
-        self.boundary_condition = boundary_cond
+        self.n_map = n_map
+        self.f_map = f_map
 
-        self.xdim, self.ydim = self.n.shape
-        self.mat_dim = self.xdim + 2, self.ydim + 2
+        self.xdim, self.ydim = self.n_map.shape
         self.idelta2 = delta[0]**-2, delta[1]**-2
 
-    def E(self) -> numpy.ndarray:
+    def compute_E(self) -> numpy.ndarray:
         raise NotImplementedError()
+
+
+class HelmholtzSolverDirichlet(HelmholtzSolver):
+    def __init__(
+            self,
+            k: float,
+            n_map: numpy.ndarray,
+            f_map: numpy.ndarray,
+            delta: Tuple[float, float],
+            boundary_conditions: Tuple[float, float, float, float] = (.0, .0, .0, .0)
+    ):
+        super().__init__(k, n_map, f_map, delta)
+        self.boundary_conditions = boundary_conditions
+
+
+class HelmholtzSolverNeumann(HelmholtzSolver):
+    def __init__(
+            self,
+            k: float,
+            n_map: numpy.ndarray,
+            f_map: numpy.ndarray,
+            delta: Tuple[float, float],
+            reflective_boundaries: bool = True
+    ):
+        super().__init__(k, n_map, f_map, delta)
+        self.reflective_boundaries = reflective_boundaries

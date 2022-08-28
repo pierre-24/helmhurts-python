@@ -1,21 +1,27 @@
 import numpy
 
-from helmhurts.solver_system import HelmholtzSolverSystem
+from helmhurts.solver_system import HelmholtzSolverDirichletSystem, HelmholtzSolverNeumannSystem
 
 import matplotlib.pyplot as plt
 
 sz = (256, 256)
+layer_size = 5
 
 # diffraction
 n = numpy.ones(sz, dtype=complex)
-n[100:110, 5:] = 2.24 - 0.021j
+
+
+n[0:layer_size, :] = n[sz[0]-layer_size-1:sz[0]-1, :] \
+    = n[:, 0: layer_size] = n[:, sz[1]-layer_size-1:sz[1]-1] = 2.24 - 0.021j
+
+n[100:110, 75:] = 2.24 - 0.021j  # wall
 
 # source
 f = numpy.zeros(sz)
-f[10:20, 10:20] = 1
+f[15:25, 15:25] = 1
 
-solver = HelmholtzSolverSystem(52, n, f, (.01, .01))
-E = solver.E()
+solver = HelmholtzSolverNeumannSystem(52, n, f, (.01, .01), reflective_boundaries=False)
+E = solver.compute_E()
 
 Er = E.real
 
@@ -39,7 +45,7 @@ fig = plt.figure(figsize=(10, 8))
 axes = fig.add_subplot()
 axes.axis([-1, 1, -1, 1])
 
-c = axes.pcolormesh(X.T, Y.T, Ep, vmin=-150, vmax=numpy.max(Ep))
+c = axes.pcolormesh(X.T, Y.T, Ep, vmin=-150, vmax=-100)
 fig.colorbar(c)
 
 fig.show()
