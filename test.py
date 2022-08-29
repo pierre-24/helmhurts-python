@@ -1,11 +1,11 @@
 import numpy
 
-from helmhurts.solver_system import HelmholtzSolverDirichletSystem, HelmholtzSolverNeumannSystem
+from helmhurts.solver_system import HelmholtzSolverNeumannSystem
 
 import matplotlib.pyplot as plt
 
-sz = (256, 256)
-layer_size = 5
+sz = (512, 512)
+layer_size = 10
 
 # diffraction
 n = numpy.ones(sz, dtype=complex)
@@ -14,7 +14,7 @@ n = numpy.ones(sz, dtype=complex)
 n[0:layer_size, :] = n[sz[0]-layer_size-1:sz[0]-1, :] \
     = n[:, 0: layer_size] = n[:, sz[1]-layer_size-1:sz[1]-1] = 2.24 - 0.021j
 
-n[100:110, 75:] = 2.24 - 0.021j  # wall
+n[100:120, 75:] = 2.24 - 0.021j  # wall
 
 # source
 f = numpy.zeros(sz)
