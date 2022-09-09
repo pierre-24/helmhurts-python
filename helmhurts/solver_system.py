@@ -55,7 +55,7 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolverDirichlet):
         f = numpy.insert(f, self.xdim, numpy.zeros(self.ydim + 2), axis=0)
         f = numpy.insert(f, 0, numpy.zeros(self.ydim + 2), axis=0)
 
-        f = f.ravel()
+        f = -f.ravel()
 
         # boundary conditions
         for j in range(0, self.xdim + 2):
@@ -111,7 +111,7 @@ class HelmholtzSolverNeumannSystem(HelmholtzSolverNeumann):
                     xm = x - 1 if x != 0 else 1
                     xp = x + 1 if x != self.xdim - 1 else self.xdim - 2
                     ym = y - 1 if y != 0 else 1
-                    yp = y + 1 if y != self.ydim -1 else self.ydim -2
+                    yp = y + 1 if y != self.ydim - 1 else self.ydim - 2
                 else:
                     xm = (x - 1) % self.xdim
                     xp = (x + 1) % self.xdim
@@ -130,7 +130,7 @@ class HelmholtzSolverNeumannSystem(HelmholtzSolverNeumann):
                     i += 1
 
         # define the source
-        f = self.f_map.ravel()
+        f = -self.f_map.ravel()
 
         # Create the system
         S = sparse.csc_array(
