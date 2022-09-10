@@ -29,7 +29,8 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolverDirichlet):
                 index_0 = numpy.ravel_multi_index((x, y), matrix_dim)
                 sparse_array_index[i] = index_0, index_0
                 sparse_array_value[i] = \
-                    (self.k / self.n_map[x - 1, y - 1]) ** 2 - 2 * self.idelta2[0] - 2 * self.idelta2[1]
+                    (self.k * self.n_map[x - 1, y - 1].real) ** 2 - 1j * self.k * self.n_map[x - 1, y - 1].imag \
+                    - 2 * self.idelta2[0] - 2 * self.idelta2[1]
 
                 xm = x - 1
                 xp = x + 1
@@ -104,7 +105,9 @@ class HelmholtzSolverNeumannSystem(HelmholtzSolverNeumann):
                 index_0 = numpy.ravel_multi_index((x, y), matrix_dim)
                 sparse_array_index[i] = index_0, index_0
                 sparse_array_value[i] = \
-                    (self.k / self.n_map[x - 1, y - 1]) ** 2 - 2 * self.idelta2[0] - 2 * self.idelta2[1]
+                    (self.k * self.n_map[x - 1, y - 1].real) ** 2 - 1j * self.k * self.n_map[x - 1, y - 1].imag \
+                    - 2 * self.idelta2[0] - 2 * self.idelta2[1]
+
                 i += 1
 
                 if self.reflective_boundaries:
