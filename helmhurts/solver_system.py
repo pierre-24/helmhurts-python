@@ -6,14 +6,26 @@ import numpy
 from scipy import sparse
 from scipy.sparse.linalg import spsolve as sparse_solve
 
-from helmhurts import HelmholtzSolverDirichlet, HelmholtzSolverNeumann
+from helmhurts import HelmholtzSolver
 
 from typing import Tuple
 
 
-class HelmholtzSolverDirichletSystem(HelmholtzSolverDirichlet):
+class HelmholtzSolverDirichletSystem(HelmholtzSolver):
+    def __init__(
+            self,
+            k: float,
+            n_map: numpy.ndarray,
+            s_map: numpy.ndarray,
+            delta: Tuple[float, float],
+            absorption_layer_thickness: int = 5,
+            absorption_layer_coef: float = 10,
+            boundary_conditions: Tuple[float, float, float, float] = (.0, .0, .0, .0)
+    ):
+        super().__init__(k, n_map, s_map, delta, absorption_layer_thickness, absorption_layer_coef)
+        self.boundary_conditions = boundary_conditions
 
-    def _Sf(self) -> Tuple[sparse.csc_array, numpy.ndarray]:
+    def _As(self) -> Tuple[sparse.csc_array, numpy.ndarray]:
         matrix_dim = self.xdim + 2, self.ydim + 2
         length = matrix_dim[0] * matrix_dim[1]
 
@@ -50,7 +62,7 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolverDirichlet):
                     i += 1
 
         # define the source
-        f = numpy.insert(self.f_map, self.xdim, numpy.zeros(self.xdim), axis=1)
+        f = numpy.insert(self.s_map, self.xdim, numpy.zeros(self.xdim), axis=1)
         f = numpy.insert(f, 0, numpy.zeros(self.xdim), axis=1)
 
         f = numpy.insert(f, self.xdim, numpy.zeros(self.ydim + 2), axis=0)
@@ -76,72 +88,15 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolverDirichlet):
                 i += 1
 
         # Create the system
-        S = sparse.csc_array(
+        A = sparse.csc_array(
             (sparse_array_value, (sparse_array_index[:, 0], sparse_array_index[:, 1])),
             shape=(length, length)
         )
 
-        return S, f
+        return A, f
 
     def compute_E(self) -> numpy.ndarray:
-        return sparse_solve(*self._Sf()).reshape((self.xdim + 2, self.ydim + 2))[1:self.xdim + 1, 1: self.ydim + 1]
-
-
-class HelmholtzSolverNeumannSystem(HelmholtzSolverNeumann):
-
-    def _Sf(self) -> Tuple[sparse.csc_array, numpy.ndarray]:
-        matrix_dim = self.xdim, self.ydim
-        length = matrix_dim[0] * matrix_dim[1]
-
-        n_sparse_value = 5 * self.xdim * self.ydim
-        sparse_array_index = numpy.zeros((n_sparse_value, 2), dtype=int)
-        sparse_array_value = numpy.zeros(n_sparse_value, dtype=self.n_map.dtype)
-        i = 0
-
-        # define the system of equation
-        for x in range(0, self.xdim):
-            for y in range(0, self.ydim):
-
-                index_0 = numpy.ravel_multi_index((x, y), matrix_dim)
-                sparse_array_index[i] = index_0, index_0
-                sparse_array_value[i] = \
-                    (self.k * self.n_map[x - 1, y - 1].real) ** 2 - 1j * self.k * self.n_map[x - 1, y - 1].imag \
-                    - 2 * self.idelta2[0] - 2 * self.idelta2[1]
-
-                i += 1
-
-                if self.reflective_boundaries:
-                    xm = x - 1 if x != 0 else 1
-                    xp = x + 1 if x != self.xdim - 1 else self.xdim - 2
-                    ym = y - 1 if y != 0 else 1
-                    yp = y + 1 if y != self.ydim - 1 else self.ydim - 2
-                else:
-                    xm = (x - 1) % self.xdim
-                    xp = (x + 1) % self.xdim
-                    ym = (y - 1) % self.ydim
-                    yp = (y + 1) % self.ydim
-
-                for coo in [
-                    (xm, y, self.idelta2[0]),
-                    (xp, y, self.idelta2[0]),
-                    (x, ym, self.idelta2[1]),
-                    (x, yp, self.idelta2[1])
-                ]:
-                    index = numpy.ravel_multi_index(coo[:2], matrix_dim)
-                    sparse_array_index[i] = index_0, index
-                    sparse_array_value[i] = coo[2]
-                    i += 1
-
-        # define the source
-        f = -self.f_map.ravel()
-
-        # Create the system
-        S = sparse.csc_array(
-            (sparse_array_value, (sparse_array_index[:, 0], sparse_array_index[:, 1])),
-            shape=(length, length)
-        )
-
-        return S, f
-
-    def compute_E(self) -> numpy.ndarray:
-        return sparse_solve(*self._Sf()).reshape((self.xdim, self.ydim))
+        return sparse_solve(*self._As()).reshape((self.xdim + 2, self.ydim + 2))[
+               1+self.absorption_layer_thickness:-1-self.absorption_layer_thickness,
+               1+self.absorption_layer_thickness:-1-self.absorption_layer_thickness
+        ]

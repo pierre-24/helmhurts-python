@@ -53,16 +53,16 @@ if __name__ == '__main__':
 
     parser.add_argument('input', type=str, help='Map of the walls')
 
-    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-150)
-    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-100)
+    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-120)
+    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-75)
     parser.add_argument('-p', '--power', type=float, help='power of the source (in V/m²?)', default=1)
     parser.add_argument('-f', '--frequency', type=float, help='frequency of the wave (in GHz)', default=2.4)
     parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.01)
     parser.add_argument('-w', '--wall-refractive', type=float, help='refractive index of the walls', default=2.24)
-    parser.add_argument('-d', '--wall-diffusive', type=float, help='diffusive power of wall (in s/m²)', default=10)
+    parser.add_argument('-d', '--wall-diffusive', type=float, help='diffusive power of wall (in s/m²)', default=0.1)
 
     parser.add_argument('--wall-color-in', type=t_color, help='color of the wall in input', default='0,0,0')
-    parser.add_argument('--wall-color-out', type=t_color, help='color of the wall in output', default='0,0,0')
+    parser.add_argument('--wall-color-out', type=t_color, help='color of the wall in output', default='255,255,255')
     parser.add_argument('--source-color-in', type=t_color, help='color of the source in input', default='255,0,0')
     parser.add_argument('--source-color-out', type=t_color, help='color of the source in output', default='255,0,0')
 
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     )] = wall_refractive_index
 
     # create source map
-    f = numpy.zeros(sz)
-    f[numpy.logical_and(
+    s = numpy.zeros(sz)
+    s[numpy.logical_and(
         im[:, :, 0] == args.source_color_in[0],
         im[:, :, 1] == args.source_color_in[1],
         im[:, :, 2] == args.source_color_in[2]
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     print('f = {:.3f} Ghz → λ = {:.4f}m → k = {:.3f}'.format(
         args.frequency, SPEED_OF_LIGHT / (args.frequency * 1e9), k))
 
-    solver = HelmholtzSolverDirichletSystem(k, n, f, (args.resolution, args.resolution))
+    solver = HelmholtzSolverDirichletSystem(k, n, s, (args.resolution, args.resolution))
     print('Computing ...', end='')
     E = solver.compute_E()
     print(' done!')
