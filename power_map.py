@@ -75,12 +75,12 @@ if __name__ == '__main__':
     parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-75)
     parser.add_argument('-p', '--power', type=float, help='power of the source (in V/m²?)', default=1)
     parser.add_argument('-f', '--frequency', type=float, help='frequency of the wave (in GHz)', default=2.4)
-    parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.02)
+    parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.01)
     parser.add_argument('-w', '--wall-refractive', type=float, help='refractive index of the walls', default=2.24)
     parser.add_argument('-d', '--wall-diffusive', type=float, help='diffusive power of wall (in S/m)', default=0.1)
 
     parser.add_argument(
-        '--alayer-thickness', type=int, help='thickness of absorption layer', default=5)
+        '--alayer-thickness', type=int, help='thickness of absorption layer', default=12)
     parser.add_argument(
         '--alayer-diffusive', type=float, help='diffusive power of absorption layer (in S/m)', default=1.0)
 

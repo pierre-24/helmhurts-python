@@ -16,7 +16,7 @@ f = 2.400 Ghz → λ = 0.1249m → k = 50.300
 Computing ... done!
 ```
 
-and gives the following output (spacial resolution: 1px → 2cm):
+and gives the following output (spacial resolution: 1px → 1cm):
 
 ![](test_out.png)
 
