@@ -31,6 +31,24 @@ def power_color_map(shape: tuple, map_in: numpy.ndarray, cmax=2) -> numpy.ndarra
     return array_out
 
 
+def logical_and(*conds):
+    """Chain conditions with AND"""
+    land = numpy.logical_and(conds[0], conds[1])
+    for c in conds[2:]:
+        land = numpy.logical_and(land, c)
+
+    return land
+
+
+def logical_or(*conds):
+    """Chain conditions with OR"""
+    lor = numpy.logical_or(conds[0], conds[1])
+    for c in conds[2:]:
+        lor = numpy.logical_or(lor, c)
+
+    return lor
+
+
 def t_color(in_str: str):
     components = in_str.split(',')
     if len(components) != 3:
@@ -57,14 +75,15 @@ if __name__ == '__main__':
     parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-75)
     parser.add_argument('-p', '--power', type=float, help='power of the source (in V/m²?)', default=1)
     parser.add_argument('-f', '--frequency', type=float, help='frequency of the wave (in GHz)', default=2.4)
-    parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.01)
+    parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.02)
     parser.add_argument('-w', '--wall-refractive', type=float, help='refractive index of the walls', default=2.24)
     parser.add_argument('-d', '--wall-diffusive', type=float, help='diffusive power of wall (in s/m²)', default=0.1)
 
-    parser.add_argument('--wall-color-in', type=t_color, help='color of the wall in input', default='0,0,0')
-    parser.add_argument('--wall-color-out', type=t_color, help='color of the wall in output', default='255,255,255')
-    parser.add_argument('--source-color-in', type=t_color, help='color of the source in input', default='255,0,0')
-    parser.add_argument('--source-color-out', type=t_color, help='color of the source in output', default='255,0,0')
+    parser.add_argument('--wall-color-in', type=t_color, help='color of the walls in input', default='0,0,0')
+    parser.add_argument(
+        '--wall-color-out', type=t_color, help='color of the contour of the walls in output', default='255,255,255')
+    parser.add_argument('--source-color-in', type=t_color, help='color of the sources in input', default='255,0,0')
+    parser.add_argument('--source-color-out', type=t_color, help='color of the sources in output', default='255,0,0')
 
     parser.add_argument('--power-map-c', type=int, help='map color shade', default=1)
 
@@ -75,15 +94,17 @@ if __name__ == '__main__':
     # create diffraction map
     n = numpy.ones(sz, dtype=complex)
     wall_refractive_index = args.wall_refractive + 1j * args.wall_diffusive
-    n[numpy.logical_and(
+    wall_mask = logical_and(
         im[:, :, 0] == args.wall_color_in[0],
         im[:, :, 1] == args.wall_color_in[1],
         im[:, :, 2] == args.wall_color_in[2]
-    )] = wall_refractive_index
+    )
+
+    n[wall_mask] = wall_refractive_index
 
     # create source map
     s = numpy.zeros(sz)
-    s[numpy.logical_and(
+    s[logical_and(
         im[:, :, 0] == args.source_color_in[0],
         im[:, :, 1] == args.source_color_in[1],
         im[:, :, 2] == args.source_color_in[2]
@@ -104,9 +125,20 @@ if __name__ == '__main__':
     Ep[Ep < 0] = .0
     Ep[Ep > 1] = 1.
 
+    im_gradient = numpy.array(numpy.gradient(im[:, :, 0]))
+
     array_out = power_color_map(im.shape, Ep, cmax=args.power_map_c)
-    array_out[numpy.logical_and(im[:, :, 0] == 0, im[:, :, 1] == 0), :] = args.wall_color_out  # wall
-    array_out[numpy.logical_and(im[:, :, 0] == 255, im[:, :, 1] == 0), :] = args.source_color_out  # source
+    array_out[
+        numpy.logical_and(
+            logical_or(im_gradient[0] > 10, im_gradient[0] < -10, im_gradient[1] > 10, im_gradient[1] < -10),
+            wall_mask
+        ), :] = args.wall_color_out  # wall
+
+    array_out[logical_and(
+        im[:, :, 0] == args.source_color_in[0],
+        im[:, :, 1] == args.source_color_in[1],
+        im[:, :, 2] == args.source_color_in[2]
+    ), :] = args.source_color_out  # source
 
     im_out = Image.fromarray(array_out, 'RGB')
     im_out.show()
