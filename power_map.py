@@ -71,8 +71,8 @@ if __name__ == '__main__':
 
     parser.add_argument('input', type=str, help='Map of the walls')
 
-    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-120)
-    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-75)
+    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-90)
+    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-60)
     parser.add_argument('-p', '--power', type=float, help='power of the source (in V/m²?)', default=1)
     parser.add_argument('-f', '--frequency', type=float, help='frequency of the wave (in GHz)', default=2.4)
     parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.01)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     print(' done!')
 
     # create power map output
-    Ep = (20 * numpy.log10(numpy.abs(E) ** 2) - args.min) / numpy.fabs(args.min - args.max)
+    Ep = (20 * numpy.log10(numpy.abs(E)) - args.min) / numpy.fabs(args.min - args.max)
     Ep[Ep < 0] = .0
     Ep[Ep > 1] = 1.
 
