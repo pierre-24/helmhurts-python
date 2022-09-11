@@ -71,8 +71,8 @@ if __name__ == '__main__':
 
     parser.add_argument('input', type=str, help='Map of the walls')
 
-    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-90)
-    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-60)
+    parser.add_argument('-m', '--min', type=float, help='Floor value of power (in dB)', default=-100)
+    parser.add_argument('-M', '--max', type=float, help='ceil value of power (in dB)', default=-70)
     parser.add_argument('-p', '--power', type=float, help='power of the source (in V/m²?)', default=1)
     parser.add_argument('-f', '--frequency', type=float, help='frequency of the wave (in GHz)', default=2.4)
     parser.add_argument('-r', '--resolution', type=float, help='spacial resolution (in m)', default=0.01)
