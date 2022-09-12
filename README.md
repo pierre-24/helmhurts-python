@@ -27,7 +27,7 @@ should be used as
 
 ```
 $ python3 ./power_map.py test.png
-f = 2.400 Ghz → λ = 0.1249m → k = 50.300
+f = 2.400 GHz → λ = 0.1249m → k = 50.300
 Computing ... done!
 ```
 

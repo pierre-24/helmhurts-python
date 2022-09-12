@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     # solve
     k = 2 * numpy.pi * args.frequency * 1e9 / SPEED_OF_LIGHT  # k = 2π/λ and λ = c/f, so k = 2πf/c
-    print('f = {:.3f} Ghz → λ = {:.4f}m → k = {:.3f}'.format(
+    print('f = {:.3f} GHz → λ = {:.4f}m → k = {:.3f}'.format(
         args.frequency, SPEED_OF_LIGHT / (args.frequency * 1e9), k))
 
     solver = HelmholtzSolverDirichletSystem(
