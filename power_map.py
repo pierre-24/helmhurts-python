@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     im_gradient = numpy.array(numpy.gradient(im[:, :, 0]))
 
-    array_out = power_color_map(im.shape, Ep, cmax=args.power_map_c)
+    array_out = power_color_map((im.shape[0], im.shape[1], 3), Ep, cmax=args.power_map_c)
     array_out[
         numpy.logical_and(
             logical_or(im_gradient[0] > 10, im_gradient[0] < -10, im_gradient[1] > 10, im_gradient[1] < -10),

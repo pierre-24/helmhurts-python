@@ -25,7 +25,7 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolver):
         super().__init__(k, n_map, s_map, delta, absorption_layer_thickness, absorption_layer_coef)
         self.boundary_conditions = boundary_conditions
 
-    def _As(self) -> Tuple[sparse.csc_array, numpy.ndarray]:
+    def _As(self) -> Tuple[sparse.csc_matrix, numpy.ndarray]:
         matrix_dim = self.xdim + 2, self.ydim + 2
         length = matrix_dim[0] * matrix_dim[1]
 
@@ -88,7 +88,7 @@ class HelmholtzSolverDirichletSystem(HelmholtzSolver):
                 i += 1
 
         # Create the system
-        A = sparse.csc_array(
+        A = sparse.csc_matrix(
             (sparse_array_value, (sparse_array_index[:, 0], sparse_array_index[:, 1])),
             shape=(length, length)
         )

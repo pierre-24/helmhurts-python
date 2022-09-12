@@ -1,0 +1,1 @@
+Images réalisées dans le cadre du billet "Où placer son routeur Wi-Fi", publié sur [Zeste de Savoir](https://zestedesavoir.com/).  
