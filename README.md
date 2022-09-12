@@ -2,6 +2,21 @@
 Solving the Helmholtz equation to model the amplitude field of wireless (in Python),
 with Dirichlet conditions on the boundaries and some diffusive term for the walls.
 
+## Install
+
+```bash
+# clone
+git clone https://github.com/pierre-24/helmhurts-python
+cd helmhurts-python
+
+# create venv
+python3 -m venv venv
+source ./venv/bin/activate
+
+# install dependancies
+pip3 install -r requirements.txt
+```
+
 ## For example
 
 The following floor plan:
